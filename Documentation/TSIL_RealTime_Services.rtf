@@ -1,0 +1,964 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fswiss\fcharset0 Helvetica-Oblique;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\vieww23780\viewh19420\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs20 \cf0 \
+
+\f1\b \ul 1.0   TSIL Name Server
+\f0\b0 \ulnone \
+\
+The TSIL Name Server is a TCP/IP based application that allows remote clients access to the channel names and units of all the channels loaded in the current configuration of Test SLATE and all the channels defined in the Real-Time Computations Interface of the TSIL package. The remote user may also access more detailed 'Channel Definitions' for all these channels if more detail other than names and units are required. This application also provides a mechanism that allows remote clients to issue an assortment of 'Control Requests' to the TSIL Interface Supervisor that provide remote clients with a way of remotely starting and stopping a data point. Other 'Control Requests' exist that allow a remote client to call user-customizable applications that perform specific functions in response to user-defined events.\
+\
+\
+
+\f1\b \ul 1.1  Using The TSIL Name Server
+\f0\b0 \ulnone \
+\
+An instance of the TSIL Name Server is started by the TSIL Interface Supervisor just after the TSIL Setup Information has been processed and just before the applications defined in the TSIL Startup Script are started. This application uses TCP/IP network port 
+\f1\b 50555
+\f0\b0  as its default port for listening for remote client connections. This default port may be changed by modifying the '
+\f1\b name_server_port
+\f0\b0 ' entry in the TSIL_APPS.ini configuration file, but this 
+\f1\b Not Recommended
+\f0\b0  and should only be done if there is an irreconcilable port conflict on the DRS Server.\
+\
+Other instances of the TSIL Name Server application may be started by the user, however it is up to the user to ensure that listening ports from these applications do not conflict with other servers on the system. The listening port for any instance of the TSLI Name Server may be set via a command line argument.\
+\
+\
+
+\f1\b \ul 1.2  Command Line Arguments
+\f0\b0 \ulnone \
+\
+
+\f1\b -port <port_nbr>
+\f0\b0 \ul \
+\ulnone This argument specifies the TCP/IP Network port that the TSIL Name Server uses to listen for client connections. The default value for this parameter is 
+\f1\b 50555
+\f0\b0 . If the user changes the port number to a value other than the default, it is the user's responsibility to ensure that the new port value does not conflict with any other servers on the system.\
+\
+\
+
+\f1\b \ul 1.3  Required DLL's
+\f0\b0 \ulnone \
+\
+The TSIL Name Server utilyzes the Test SLATE Reflective Memory Ring if it is present. Therefore the dll, rfm2gdll_stdc.dll, must be accessible by this application. Even if the Reflective Memory Device is not active, this dll must be accessible for the TSIL Name Server to operate correctly.\
+\
+\
+
+\f1\b \ul 1.4  User-Definable Urgent Action Control
+\f0\b0 \ulnone \
+\
+The Urgent Action Control Request causes the TSIL Interface Supervisor to execute an instance of the TSIL Urgent Action application. The syntax for the 'Urgent Action' request is described in detail in Section 2.2.8. The request data packet sent to the server from the remote client contains 5 input parameters of the type INT32. These input parameters are passed to the TSIL Urgent Action application as command line arguments at startup.\
+\
+The idea is that a remote client detects a situation that requires some action from the TSIL package and sends the Urgent Action Control Request to the TSIL Name Server. This request contains values for the 5 input parameters that describe the action to be taken. As a consequence of a client issuing this request, the TSIL Interface Supervisor executes an instance of the TSIL Urgent Action application and passes the client's input parameters to it through command line arguments. That application then decodes the input parameters, determines what action the client request wants it to take based on the input, performs the action, and then exits.\
+\
+ \
+
+\f1\b \ul 1.5  User-Definable User Notification Control
+\f0\b0 \ulnone \
+\
+The User Notification Control Request causes the TSIL Interface Supervisor to execute an instance of the TSIL User Notification application. The syntax for the 'User Notification' request is described in detail in Section 2.2.9. The request data packet sent to the server from the remote client contains 5 input parameters of the type INT32. These input parameters are passed to the TSIL User Notification application as command line arguments at startup.\
+\
+The idea is that a remote client detects a situation that triggers a user notification event, it sends the User Notification Control Request to the TSIL Name Server. This request contains values for the 5 input parameters that describe the event. As a consequence of a client issuing this request, the TSIL Interface Supervisor executes an instance of the TSIL User Notification application and passes the client's input parameters to it through command line arguments. That application then decodes the input parameters, determines the event that client request has specified, performs the actions to respond to that event, and then exits.\
+\
+\
+
+\f1\b \ul 1.6  Event/Error Messages
+\f0\b0 \ulnone \
+\
+
+\f2\i \ul \
+
+\f0\i0 \ulnone <Starting the TSIL Name Server Application>\
+\
+
+\f1\b Type:
+\f0\b0  Information Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Interface Supervisor has started.\
+
+\f1\b Action:
+\f0\b0  No User action required\
+\
+
+\f2\i \ul \
+
+\f0\i0 \ulnone <Listening for client connection on TCP/IP port = ...>\
+\
+
+\f1\b Type:
+\f0\b0  Information Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server is currently listening for client connections on the specified TCP/IP network port.\
+
+\f1\b Action:
+\f0\b0  No User action required\
+\
+\
+<Unable to communicate with Reflective Memory Device; Device Number = ....>\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server was unable to communicate with the Reflective Memory Device.\
+
+\f1\b Action:
+\f0\b0  The user should re-boot the DRS Server and the Test SLATE MOC machine and restart Test SLATE. If this does not clear this error, a qualified technician should run the diagnostic routines for the Reflective Memory Device and correct any problems that are found. If this message still persists, notify a qualified TSIL administrator.\
+\
+\
+<Unable to successfully initialize application; Terminating Process>\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server was unable to complete all of the initialization functions that are required to allow the application to function properly.\
+
+\f1\b Action:
+\f0\b0  The user should re-boot the DRS Server and the Test SLATE MOC machine and restart Test SLATE. If this message persists, notify a qualified TSIL administrator.\
+\
+\
+<Unable to initialize WinSock library version 2.01">\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server was unable to initailize the Winsock libray which creates the network resources necessary for the server to communicate with remote client.\
+
+\f1\b Action:
+\f0\b0  The user should re-boot the DRS Server and the Test SLATE MOC machine and restart Test SLATE. If this message persists, notify a qualified TSIL administrator.\
+\
+
+\f2\i \ul \
+
+\f0\i0 \ulnone <Unable to open the Local Shared Memory Device>\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server was unable to allocate the resources necessary for the application to open the 'Local Shared Memory Device'. These resources are required to allow the application to function properly.\
+
+\f1\b Action:
+\f0\b0  The user should re-boot the DRS Server and the Test SLATE MOC machine and restart Test SLATE. If this message persists, notify a qualified TSIL administrator.\
+\
+
+\f2\i \ul \
+
+\f0\i0 \ulnone <Unable to allocate resources to attach to the Local Shared-Memory Area>\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server was unable to attach to the shared memory area created by the TSIL Interface Supervisor.\
+
+\f1\b Action:
+\f0\b0  The user should re-boot the DRS Server and the Test SLATE MOC machine and restart Test SLATE. If this message persists, notify a qualified TSIL administrator.\
+\
+\
+<Unable to create a listening socket on TCP/IP port = ...>\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server was unable to create the TCP/IP listening socket that faciltates connections froma remote client.\
+
+\f1\b Action:
+\f0\b0  The user should check to make sure no other server is using the specified listening port of this instance of the TSIL Name Server. One this situation is corrected the user should re-boot the DRS Server and the Test SLATE MOC machine and restart Test SLATE. If this message persists, notify a qualified TSIL administrator.\
+\
+\
+<Unable to attach to the TSIL Interface Supervisor for Control Message Processing>\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server was unable to connect to the message queue that the TSIL Interface Supervisor establishes in order that remote clients can issue it 'Control Messages'.\
+
+\f1\b Action:
+\f0\b0  The user should re-boot the DRS Server and the Test SLATE MOC machine and restart Test SLATE. If this message persists, notify a qualified TSIL administrator.\
+\
+\
+<Request Handler encountered an abnormal termination event>\
+\
+
+\f1\b Type:
+\f0\b0  Error Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server encountered an abnormal termination event and is no longer serving remote clients.\
+
+\f1\b Action:
+\f0\b0  The user needs to re-start this instance on the TSIL Name Server. Unloading and Re-loading a configuration in Test SLATE will bring up a new instance of the TSIL Name Server. If the user is using the default port and does not wish to take down Test SLATE, the user can use Windows Explorer to restart the TSIL Name Server. If another port is being used as the listening port, the user must use a console terminal to restart the application and supply that port number via the '-port' command line argument.\
+\
+\
+<TSIL Name Server Request Handler has stopped>\
+\
+
+\f1\b Type:
+\f0\b0  Information Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the request handler of the TSIL Name Server has stopped.\
+
+\f1\b Action:
+\f0\b0  No User action required unless with this message is accompanied by one of the 'Error Messages' described above.\
+\
+\
+<TSIL Shutdown Signal Received>\
+\
+
+\f1\b Type:
+\f0\b0  Information Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server has received the TSIL Shutdown signal. This signal causes the application to perform its normal shutdown routine.\
+
+\f1\b Action:
+\f0\b0  No User action required unless with the application does not shutdown. In the event that this occurs, use the Windows Task Manager Utility to shutdown the process and notify a qualified TSIL administrator if this problem continues to occur.\
+\
+\
+<Console Interrupt Signal Received>\
+\
+
+\f1\b Type:
+\f0\b0  Information Message\
+
+\f1\b Purpose:
+\f0\b0  To inform the user that the TSIL Name Server has received a 'Console Interrupt' signal. This signal causes the application to perform its normal shutdown routine.\
+
+\f1\b Action:
+\f0\b0  No User action required unless with the application does not shutdown. In the event that this occurs, use the Windows Task Manager Utility to shutdown the process and notify a qualified TSIL administrator if this problem continues to occur.\
+\
+\
+\
+
+\f1\b \ul 2.0  Communications Prorocol
+\f0\b0 \ulnone \
+\
+All communications between the TSIL Name Server and a remote client must be initiated by the remote client. The TSIL Name Server is strictly a server, and the remote system is the client. The remote client must send a request to the TSIL Name Server. The server processes the request, and then responds back to the remote client, completing the transaction.\
+\
+All request and responses consist of a header packet and an optional data packet. A packet is defined as data transferred in a single input or output operation. Therefore, the header and data packets are transferred as two separate operations.\
+\
+The TSIL Name Server processes requests from a remote client according to the function code indicated in the header packet and any parameter information contained in an optional data packet. The response sent back to the remote client consists of a header packet and an optional data packet.\
+\
+The header packet of the client request <Request Header Packet> consists of two 32-bit words. The header packet of the server\'92s response <Response Header Packet> consists of twelve 32-bit words. The optional data packets of both the client and the server are of variable length. The valid request and response header packet formats are described in the following sections.\
+\
+\
+
+\f1\b \ul 2.1  Header Packets
+\f0\b0 \ulnone \
+\
+Request Header Packets\
+\
+
+\f1\b \ul DWord <int32>\ulnone    \ul Contents
+\f0\b0 \ulnone \
+1                        Function Request Code - Valid requests codes are:\
+\
+                          26   - Retrieve System Information\
+                          25   - Retrieve Channel Names\
+                          24   - Retrieve Channel Units\
+                          20   - Retrieve a Channel Definition\
+                          22   - Retrieve Channel Information\
+                          15   - Initiate Recording of a Data Point\
+                          110 - Request a User-Defined Urgent Action\
+                          111 - Request a User Notification Event\
+\
+2                        Data Packet Size - Indicates the number of bytes to follow in a data packet. If this \
+                          parameter is zero, then the server does not expect a data packet from the client.\
+\
+\
+\
+Response Header Packets\
+\
+
+\f1\b \ul DWord <int32>\ulnone    \ul Contents
+\f0\b0 \ulnone \
+1                        Function Response Code - Valid requests codes are:\
+\
+                         >0  -  Indicates a successful response to the request\
+                         -1   -  Indicates an unsuccessful response to the request\
+\
+2                        Data Packet Size - Indicates the number of bytes to follow in a data packet. If this \
+                          parameter is zero, then the server does not send a data packet to the client.\
+\
+3                        DAS Status\
+4                        Test Point Sequence Number\
+5                        Configuration ID\
+6                        Cell ID\
+7                        User Parameter - 1\
+8                        User Parameter - 2\
+9                        User Parameter - 3\
+10                      User Parameter - 4\
+11                      User Parameter - 5\
+12                      User Parameter - 6\
+\
+
+\f1\b DAS Status
+\f0\b0 \
+The DAS Status is set to the current value of the TSIL DAS Status parameter. Valid values for this parameter are shown below.\
+\
+Value           System Status\
+    0              DAS READY; normal operating state; \
+    1              DAS NOT READY; data recording is not available for some reason\
+    3              DAS RECORDING; data is currently being recorded to disk\
+    4              DAS CALIBRATING; one or more DAUs are calibrating\
+    5              DAS DEAD; the system has experienced an un-recoverable error of some kind\
+    6              DAS SHUTDOWN; the system is currently executing its normal shutdown procedure\
+\
+
+\f1\b Test Point Sequence Number
+\f0\b0 \
+The Test Point Sequence Number is incremented by 1 whenever all recording and data processing activities have been completed for the current test point. It is meant to be an indication to a remote client that all the data for the current test point, both recorded and processed, is available to be shared with remote clients.\
+\
+
+\f1\b Configuration ID
+\f0\b0 \
+The Configuration ID is a primary and secondary key that is used by Test SLATE's Configuration Database. This parameter is used in conjunction with the Cell ID (described below) to identify the values of many parameters defined for the configuration currently loaded into Test SLATE.\
+\
+
+\f1\b Cell ID
+\f0\b0 \
+The Cell ID is a primary and secondary key that is used by Test SLATE's Configuration Database. This parameter is used in conjunction with the Configuration ID (described above) to identify the values of many parameters defined for the cofiguration currently loaded into Test SLATE.\
+\
+
+\f1\b User Parameter 1 to 4
+\f0\b0 \
+These parameters are currently not defined for any TSIL functions.\
+\
+
+\f1\b User Parameter 5
+\f0\b0 \
+If defined, this parameter is set to the 'TSIL Facility ID'\
+\
+
+\f1\b User Parameter 6
+\f0\b0 \
+If defined, this parameter is set to the 'TSIL System ID'\
+\
+\
+Any transmitted data will be in standard 'Network Order'. It is left up to the client to convert the transmitted values into the appropriate host ordering protocol. Common functions for achieving this conversion are ntohl () and ntohs (). Even if the remote machine's ordering protocol matches the 'Network Order' protocol, it is generally good practice to do these conversions anyway.\
+\
+\
+\
+
+\f1\b \ul 2.2  Data Packets
+\f0\b0 \ulnone \
+\
+The following sections describe the formats of the various requests and response packets.\
+\
+\
+
+\f1\b \ul 2.2.1  Retrieve System Information  <Code = 26>
+\f0\b0 \ulnone \
+\
+Request Data Packet: None\
+\
+Response Data Packet: None\
+\
+A request for system information returns only the response header to the remote client, no data packet is returned. This header will be filled with current values for all of the defined parameters. The system information contained in this header is described in section 2.1.\
+\
+\
+
+\f1\b \ul 2.2.2  Retrieve Channel Names  <Code = 25>
+\f0\b0 \ulnone \
+\
+Request Data Packet: None\
+\
+Response Data Packet:\
+
+\f1\b \
+\ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1 - 13                         Not Used - Skip\
+14                              Number of Channels - N Data Items  <INT32>\
+15-18                         Name for Data Item 1  <CHAR>\
+19                             Truncation Flag for Data Item 1  <INT32>\
+20                             TSIL Index for Data Item 1  <INT32>\
+21-24                         Name for Data Item 2  <CHAR>\
+25                             Truncation Flag for Data Item 2  <INT32>\
+26                             TSIL Index for Data Item 2  <INT32>\
+27-30                         Name for Data Item 3  <CHAR>\
+31                             Truncation Flag for Data Item 3  <INT32>\
+32                             TSIL Index for Data Item 3  <INT32>\
+         <...>\
+For N Data Items\
+\
+
+\f1\b Notes:
+\f0\b0 \
+1. The 'Name' parameter is a NULL Terminated String\
+2. The 'Truncation Flag' is non-zero if the 'Name' parameter has been truncated\
+\
+\
+
+\f1\b \ul 2.2.3  Retrieve Channel Units  <Code = 24>
+\f0\b0 \ulnone \
+\
+Request Data Packet: None\
+\
+Response Data Packet:\
+
+\f1\b \
+\ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1 - 13                         Not Used - Skip
+\f1\b \ul \
+
+\f0\b0 \ulnone 14                              Number of Channels - N Data Items  <INT32>\
+15-18                         Units for Data Item 1   <CHAR>\
+19                             Truncation Flag for Data Item 1 <INT32>\
+20                             TSIL Index for Data Item 1  <INT32>\
+21-24                         Units for Data Item 2  <CHAR>\
+25                             Truncation Flag for Data Item 2  <INT32>\
+26                             TSIL Index for Data Item 2  <INT32>\
+27-30                         Units for Data Item 3  <CHAR>\
+31                             Truncation Flag for Data Item 3  <INT32>\
+32                             TSIL Index for Data Item 3  <INT32>\
+         <...>\
+For N Data Items\
+\
+
+\f1\b Notes:
+\f0\b0 \
+1. The 'Units' parameter is a NULL Terminated String\
+2. The 'Truncation Flag' is non-zero if the 'Units' parameter has been truncated\
+3. The order of the 'Units' parameters correspond to the order of the 'Names'\
+    parameters described above <Request Code - 25>. That is the 'Units' for\
+    data item 1 is associated with the 'Names' parameter for data item 1. The\
+    'Units' parameter for data item 2 is associated with the 'Names' parameter\
+    for data item 2, and so on.\
+\
+\
+\
+
+\f1\b \ul 2.2.4 Retrieve a Channel Definition  <Code = 20>
+\f0\b0 \ulnone \
+\
+Request Data Packet:\
+ \
+
+\f1\b \ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1                               TSIL Channel Index of the Requested Channel <INT32>\
+\
+Response Data Packet:\
+
+\f1\b \
+\ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1-14                         Not Used - Skip
+\f1\b \ul \
+
+\f0\b0 \ulnone 15-82                        TSIL Channel Definition of the Requested Channel\
+\
+
+\f1\b Notes:
+\f0\b0 \
+1. The structure of the TSIL Channel Definition is detailed in Appendix A of this document.\
+\
+\
+\
+
+\f1\b \ul 2.2.5 Retrieve Channel Information  <Code = 22>
+\f0\b0 \ulnone \
+\
+Request Data Packet: None\
+ \
+Response Data Packet:\
+
+\f1\b \
+\ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1-13                           Not Used - Skip\
+14                              Number of Channels - N Data Items  <INT32>\
+15-82                         TSIL Channel Definition of the Data Item 1\
+82-85                         Not Used - Skip\
+86-153                       TSIL Channel Definition of the Data Item 2\
+154-157                      Not Used - Skip\
+158-225                      TSIL Channel Definition of the Data Item 3\
+226-229                      Not Used - Skip\
+         <...>\
+For N Data Items\
+\
+
+\f1\b \
+Notes:
+\f0\b0 \
+1. The structure of the TSIL Channel Definition is detailed in Appendix A of this document.\
+\
+\
+\
+
+\f1\b \ul 2.2.6  Initiate Recording of a Data Point <Code = 15>
+\f0\b0 \ulnone \
+\
+Request Data Packet: None\
+\
+Response Data Packet: None\
+\
+A request to initiate recording of a data point only returns the response header to the remote client, no data packet is returned. This header will be filled with current values for all of the defined parameters.\
+
+\f1\b \
+
+\f0\b0 \
+
+\f1\b \ul 2.2.7  Stop Recording of a Data Point <Code = 12>
+\f0\b0 \ulnone \
+\
+Request Data Packet: None\
+\
+Response Data Packet: None\
+\
+A request to stop recording of a data point only returns the response header to the remote client, no data packet is returned. This header will be filled with current values for all of the defined parameters.\
+
+\f1\b \
+\
+\
+
+\f0\b0 \
+\
+
+\f1\b \ul 2.2.8  Request a User-Defined Urgent Action  <Code = 110>
+\f0\b0 \ulnone \
+\
+Request Data Packet:\
+ \
+
+\f1\b \ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1                               Type of Action <INT32>\
+2                               Operation Code  <INT32>\
+3                               Action Mode  <INT32>\
+4                               Action Format  <INT32>\
+5                               Action ID  <INT32>\
+\
+\
+Response Data Packet: None\
+\
+This request only returns the response header to the remote client, no data packet is returned. This header will be filled with current values for all of the defined parameters.\
+\
+This requests causes the TSIL Interface Supervisor to execute a User-Customizable process in response to the request. The Request Data parameters are passed to this process as command line arguments. Refer to the User's Guide for the TSIL Interface Supervisor for details about the 'TSIL Urgent Action' process that is called in response to this request.\
+\
+\
+\
+
+\f1\b \ul 2.2.9  Request a User Notification Event  <Code = 111>
+\f0\b0 \ulnone \
+\
+Request Data Packet:\
+ \
+
+\f1\b \ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1                               Type of Notification Event <INT32>\
+2                               Operation Code  <INT32>\
+3                               Event Mode  <INT32>\
+4                               Event Format  <INT32>\
+5                               Event ID  <INT32>\
+\
+\
+Response Data Packet: None\
+\
+This request only returns the response header to the remote client, no data packet is returned. This header will be filled with current values for all of the defined parameters.\
+\
+This requests causes the TSIL Interface Supervisor to execute a User-Customizable process in response to the request. The Request Data parameters are passed to this process as command line arguments. Refer to the User's Guide for the TSIL Interface Supervisor for details about the 'TSIL User Notification' process that is called in response to this request.\
+\
+\
+\
+\
+\
+
+\f1\b \ul 3.0 TSIL Multicast Service\
+Default UDP Port = 13130\
+Default Group Address = '234.55.66.77" \
+\
+
+\f0\b0 \ulnone The TSIL Multicast Service is a UDP-Datagram based application that allows remote clients access to the \'91Real-Time EU Values\'92 of all the channels loaded in the current configuration of Test SLATE and all the channels defined in the Real-Time Computations Interface of the TSIL package. These datagrams are transmitted using the \'93Multicast IP\'92 protocol which allows communication between a single sender and multiple receivers on a network.\
+\
+This service uses \'91Group Address\'92 \'93234.55.66.77\'94 and UDP network port 13130 as its default address and port for listening for TSIL Datagrams. These default settings may be changed by modifying entries in a configuration file, but this 
+\f1\b Not Recommended
+\f0\b0  and should only be done if there is an irreconcilable conflicts on the system\'92s Data Network.\
+\
+The format of the datagram transmitted by this service is described below. It contains a 64-byte informational header followed by a list of \'914-byte Float\'92 values. This list contains the \'91Real-Time EU Values\'92 of all the channels defined in TSIL. The values in this list are ordered with respect to the tag order established by the 'RETRIEVE CHANNEL NAMES' request <Request Code = 25> of the TSIL Names Server described earlier.\
+\
+
+\f1\b \
+\ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+    1                           Request Code  <INT32>
+\f1\b \ul \
+
+\f0\b0 \ulnone     2                           Data Packet Size  <INT32>\
+    3                           DAS Status  <INT32>\
+    4                           Test Point Sequence Number  <INT32>\
+    5                           Configuration ID  <INT32>\
+    6                           Cell ID  <INT32>\
+    7                           User Parameter - 1  <INT32>\
+    8                           User Parameter - 2  <INT32> \
+    9                           User Parameter - 3  <INT32>\
+    10                         User Parameter - 4  <INT32>\
+    11                         User Parameter - 5  <INT32>\
+    12                         User Parameter - 6  <INT32>\
+    13                         Message ID  <INT32>\
+    14                         Option Flags  <INT32>\
+    15                         User Parameter - 7  <INT32>\
+    16                         Number of Channels  <INT32>\
+    17-...                     Real Time Data  <List of FLOATs>\
+\
+
+\f1\b Request Code
+\f0\b0 \
+The Request Code is used to identify this packet as a TSIL Multicast Real-Time Data Packet. It will always be set to a value of 6.\
+\
+
+\f1\b Data Packet Size
+\f0\b0 \
+The Data Packet Size is the total number of bytes in the packet, both the header data and the real time data include.\
+\
+
+\f1\b DAS Status
+\f0\b0 \
+The DAS Status is set to the current value of the TSIL DAS Status parameter. Valid value for this parameter are shown below.\
+\
+Value           System Status\
+    0              DAS READY; normal operating state; \
+    1              DAS NOT READY; data recording is not available for some reason\
+    3              DAS RECORDING; data is currently being recorded to disk\
+    4              DAS CALIBRATING; one or more DAUs are calibrating\
+    5              DAS DEAD; the system has experienced an un-recoverable error of some kind\
+    6              DAS SHUTDOWN; the system is currently executing its normal shutdown procedure\
+\
+
+\f1\b Test Point Sequence Number
+\f0\b0 \
+The Test Point Sequence Number is incremented by 1 whenever all recording and data processing activities have been completed for the current test point. It is meant to be an indication to a remote client that all the data for the current test point, both recorded and processed, is available to be shared with remote clients.\
+\
+
+\f1\b Configuration ID
+\f0\b0 \
+The Configuration ID is a primary and secondary key that is used by Test SLATE's Configuration Database. This parameter is used in conjunction with the Cell ID (described below) to identify the values of many parameters defined for the configuration currently loaded into Test SLATE.\
+\
+
+\f1\b Cell ID
+\f0\b0 \
+The Cell ID is a primary and secondary key that is used by Test SLATE's Configuration Database. This parameter is used in conjunction with the Configuration ID (described above) to identify the values of many parameters defined for the cofiguration currently loaded into Test SLATE.\
+\
+
+\f1\b User Parameter 1 to 3
+\f0\b0 \
+These parameters are currently not defined for any TSIL functions.\
+\
+
+\f1\b User Parameter 4
+\f0\b0 \
+For the PCS system at NTF, this parameter will be zero except for two situations. If the PCS Neff 620 is calibrating, Bit 00 <the least significant bit> will be set. If the ESP 8400 is calibrating, Bit 01 will be set.\
+\
+
+\f1\b User Parameter 5
+\f0\b0 \
+If defined, this parameter is set to the 'TSIL Facility ID'\
+\
+
+\f1\b User Parameter 6
+\f0\b0 \
+If defined, this parameter is set to the 'TSIL System ID'\
+\
+
+\f1\b Message ID
+\f0\b0 \
+The Message ID is used to identify the message as a TSIL Multicast Real-Time Data Message. It will always be set to a value of 7.\
+\
+
+\f1\b Option Flags
+\f0\b0 \
+This parameter is currently not used for any TSIL functions.\
+\
+
+\f1\b User Parameter 7
+\f0\b0 \
+This parameter is currently not used for any TSIL functions.\
+\
+
+\f1\b Number of Channels
+\f0\b0 \
+This parameter is set to the number of channels that are contained in the data portion of this packet. As a verification check of this packet, the following equation will always hold true:\
+
+\f1\b Data Packet Size 
+\f0\b0 =  (4 * 
+\f1\b Number of Channels
+\f0\b0 ) + 64\
+\
+\
+
+\f1\b Real-Time Data
+\f0\b0 \
+The Real-Time Data portion of this packet consists of a list of floats whose length is defined by the 
+\f1\b Number of Channels
+\f0\b0  parameter described above. These values are ordered within the data packet with respect to the tag order established by the 'RETRIEVE CHANNEL NAMES' request <Request Code = 25> of the TSIL Names Server.\
+\
+\
+
+\f1\b Note:
+\f0\b0 \
+Any transmitted data will be in standard 'Network Order'. It is left up to the client to convert the transmitted values into the appropriate host ordering protocol. Common functions for achieving this conversion are ntohl () and ntohs (). Even if the remote machine's ordering protocol matches the 'Network Order' protocol, it is generally good practice to do these conversions anyway.\
+\
+
+\f1\b \ul \
+
+\f0\b0 \ulnone \
+\
+\
+\
+
+\f1\b \ul Appendix A - TSIL Channel Definition
+\f0\b0 \ulnone \
+\
+For the client request detailed in section 2.2.4 and 2.2.5, the response data packet sent to the remote client includes a 'TSIL Channel Definition' structure as part of the response. The section below provides a detailed description of that structure.\
+
+\f1\b \
+\ul DWORD\ulnone   <int32>       \ul Contents
+\f0\b0 \ulnone \
+1-4                            Channel Name  <CHAR>\
+5                               Truncation Flag for Channel Name  <INT32>\
+6-21                          Channel Description  <CHAR>\
+22                             Truncation Flag for Channel Description  <INT32>\
+23-26                        Channel Units  <CHAR>\
+27                             Truncation Flag for Channel Units  <INT32>\
+28                             TSIL Channel Index  <INT32>\
+29                             DAU Type <INT32>\
+30                             Device Index  <INT32>\
+31                             Channel Number  <INT32>\
+32                             Slot Number  <INT32>\
+33                             Input Unit Number  <INT32>\
+34                             Channel ID <INT32>\
+35                             Tag ID  <INT32>\
+36                             Range Code  <INT32>\
+37                             Filter Code  <INT32>\
+38                             Conversion Code  <INT32>\
+39                             RFM EU Offset  <INT32>\
+40                             RFM Millivolt Offset  <INT32>\
+41                             RFM Raw Counts Offset  <INT32>\
+42                             RFM Channel Status Offset  <INT32>\
+43                             Conversion Parameter 5  <INT32>\
+44                             Reference Channel  <INT32>\
+45                             Data Zero Type  <INT32>\
+46                             Options Flag  <INT32>\
+47-54                        Coefficients  <FLOAT>\
+55                            Zero  <FLOAT>\
+56                            Excitation  <FLOAT>\
+57                            Data Type  <INT32>                                \
+58                            Input Type  <INT32>\
+59                            Excitation Range  <INT32>\
+60                            Source ID  <INT32>\
+61                            Source Class  <INT32>\
+62                            Source Type  <INT32>\
+63                            Source Number  <INT32>\
+64                            Device Parameter - 1  <INT32>\
+65                            Device Parameter - 2  <INT32>\
+66                            Device Parameter - 3  <INT32>\
+67                            Device Parameter - 4  <INT32>\
+68                            Device Parameter - 5  <INT32>\
+\
+\
+
+\f1\b Channel Name  <CHAR[16]>
+\f0\b0 \
+Null terminated string containing the TSIL Name of the channel the structure contains informaton for. The first 12 bytes contain the first 12 bytes of the name and the last 4 bytes are NULL.\
+\
+
+\f1\b Truncation Flag for Channel Name  <INT32>
+\f0\b0 \
+This integer value is non-zero if the actual TSIL Channel name is more than 12 characters and has been truncated.\
+\
+
+\f1\b Channel Description  <CHAR[64]>
+\f0\b0 \
+Null terminated string containing the description of the channel the structure contains informaton for. The first 60 bytes contain the first 60 bytes of the description and the last 4 bytes are NULL.\
+\
+
+\f1\b Truncation Flag for Channel Description  <INT32>
+\f0\b0 \
+This integer value is non-zero if the actual channel description is more than 60 characters and has been truncated.\
+\
+
+\f1\b Channel Units  <CHAR[16]>
+\f0\b0 \
+Null terminated string containing the units of the channel the structure contains informaton for. The first 12 bytes contain the first 12 bytes of the units and the last 4 bytes are NULL.\
+\
+
+\f1\b Truncation Flag for Channel Units  <INT32>
+\f0\b0 \
+This integer value is non-zero if the actual channel units is more than 12 characters and has been truncated.\
+\
+
+\f1\b TSIL Channel Index  <INT32>
+\f0\b0 \
+This integer value is the TSIL Channel Index assigned to this channel.\
+\
+
+\f1\b DAU Type  <INT32>
+\f0\b0 \
+This integer value is the TSIL DAU Type assigned to this channel. Valid Values are as follows:\
+\
+<ADD STUFF>\
+\
+\
+
+\f1\b Device Index  <INT32>
+\f0\b0 \
+This integer value is currently not used.\
+\
+
+\f1\b Channel Number  <INT32>
+\f0\b0 \
+This integer value is the channel number with respect to the hardware. Different DAU's have different interpretations for this parameter. This parameter is not applicable for any channel that is not associated with a physical DAU.\
+\
+
+\f1\b Slot Number  <INT32>
+\f0\b0 \
+This integer value is the slot number with respect to the hardware. Different DAU's have different interpretations for this parameter. This parameter is not applicable for any channel that is not associated with a physical DAU.\
+\
+
+\f1\b Input Unit Number  <INT32>
+\f0\b0 \
+This integer value is the input unit number with respect to the hardware. Different DAU's have different interpretations for this parameter. This parameter is not applicable for any channel that is not associated with a physical DAU.\
+\
+
+\f1\b Channel ID  <INT32>
+\f0\b0 \
+The Channel ID is a primary and secondary key that is used by Test SLATE's Configuration Database. This parameter is used to associate a Tag ID (described below) to a physical channel defined in Test SLATE. This parameter is not applicable for any channel that is not associated with a physical DAU.\
+\
+
+\f1\b Tag ID  <INT32>
+\f0\b0 \
+The Tag ID is a primary and secondary key that is used by Test SLATE's Configuration Database. This parameter is used to associate a TSIL defined channel with a Test SLATE channel that is defined in the database tables for the loaded configuration.\
+\
+
+\f1\b Range Code  <INT32>
+\f0\b0 \
+This integer value is the range code for the defined channel with respect to the hardware. Different DAU's have different interpretations for this parameter. This parameter is not applicable for any channel that is not associated with a physical DAU.\
+\
+
+\f1\b Filter Code  <INT32>
+\f0\b0 \
+This integer value is the filter code for the defined channel with respect to the hardware. Different DAU's have different interpretations for this parameter. This parameter is not applicable for any channel that is not associated with a physical DAU.\
+\
+
+\f1\b Conversion Code  <INT32>
+\f0\b0 \
+This integer value is currently not used.\
+\
+
+\f1\b RFM EU Offset  <INT32>
+\f0\b0 \
+This integer value is used to locate the Real-Time EU Value of the defined channel on the Test SLATE Reflective Memory Device. The EU value is a 4-byte float located at the offset defined by this parameter. This value is be applicable for all defined channels.\
+\
+
+\f1\b RFM Millivolt Offset  <INT32>
+\f0\b0 \
+This integer value is used to locate the Real-Time Millivolt Value of the defined channel on the Test SLATE Reflective Memory Device. The Millivolt value is a 4-byte float located at the offset defined by this parameter. This parameter is not applicable for any channel that is not associated with a physical DAU. Also, some DAU's do not provide this information. If this parameter is not applicable to the defined channel, the value is set to '-1', which is an INVALID Offset.\
+\
+
+\f1\b RFM Raw Counts Offset  <INT32>
+\f0\b0 \
+This integer value is used to locate the Real-Time Raw Counts Value of the defined channel on the Test SLATE Reflective Memory Device. The Raw Counts value is a 4-byte float located at the offset defined by this parameter. This parameter is not applicable for any channel that is not associated with a physical DAU. Also, some DAU's do not provide this information. If this parameter is not applicable to the defined channel, the value is set to '-1', which is an INVALID Offset.\
+\
+
+\f1\b RFM Channel Status Offset  <INT32>
+\f0\b0 \
+This integer value is used to locate the Real-Time Channel Status Value of the defined channel on the Test SLATE Reflective Memory Device. The Status value is a 2-byte integer located at the offset defined by this parameter. This value will be applicable for all defined channels but the sense of the bits is different for different DAU types.\
+\
+
+\f1\b Conversion Parameter 5  <INT32>
+\f0\b0 \
+This integer value is currently not used.\
+\
+
+\f1\b Reference Channel  <INT32>
+\f0\b0 \
+This integer value is currently not used.\
+\
+
+\f1\b Data Zero Type  <INT32>
+\f0\b0 \
+This integer value is currently not used.\
+\
+
+\f1\b Options Flag  <INT32>
+\f0\b0 \
+This integer value is currently not used.\
+\
+
+\f1\b Coefficients  <Float[8]>
+\f0\b0 \
+These 4-byte float values are currently not used.\
+\
+
+\f1\b Zero <Float>
+\f0\b0 \
+This  4-byte float value is currently not used.\
+\
+
+\f1\b Excitation <Float>
+\f0\b0 \
+This  4-byte float value is currently not used.\
+\
+
+\f1\b Data Type  <INT32>
+\f0\b0 \
+This integer value is used define the data type with respect to Test SLATE data defintions. Valid data type are as follows:\
+\
+\ul Type\ulnone                               \ul Value\ulnone \
+Analog Input Type              1\
+Digital Input Type               2\
+Calculated Input Type         3\
+User Input Type                  4\
+User Supplied Type            5\
+\
+
+\f1\b Input Type  <INT32>
+\f0\b0 \
+This integer value is used define the type of input unit that is providing the data for the specified channel. There are three standard types that are basically the normal inputs defined by the basic Test SLATE package. These are the following\
+Normal Digital Input            2\
+Normal Calculated Input      3\
+\
+There are several cases where the input unit is of such a special nature that unique input types are assigned for them. These are the following\
+\
+\ul Type\ulnone                               \ul Value\ulnone \
+Wyle DIA                         101\
+Standard PSI Module        102\
+DTC PSI Module               103\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}
